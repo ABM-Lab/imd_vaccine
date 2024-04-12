@@ -1,0 +1,9 @@
+[deps]
+CSV = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
+DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
+DataFramesMeta = "1313f7d8-7da2-5740-9ea0-a2ca25f37964"
+Gnuplot = "dc211083-a33a-5b79-959f-2ff34033469d"
+JLD2 = "033835bb-8acc-5ee8-8aae-3f567f8a3819"
+MCMCChains = "c7f686f2-ff18-58e9-bc7b-31028e88f75d"
+MCMCDiagnosticTools = "be115224-59cd-429b-ad48-344e309966f0"
+Turing = "fce5fe82-541a-59a6-adf8-730c64b5f9a0"
