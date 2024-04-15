@@ -3,8 +3,7 @@
 # https://doi.org/10.1186/s12879-021-06906-x
 
 using Turing, MCMCChains, MCMCDiagnosticTools
-using Gnuplot
-using JLD2
+using Random 
 
 function get_data() 
     cc, pp = get_raw_data()
@@ -103,12 +102,7 @@ function get_raw_data()
 end
 
 @model function model(data, K)
-    max_ag, max_t, max_d = size(data) # maximum age group, time, vaccine 
-    
-    # set of results 
-    # rho (-10, 0.5), beta (0, 0.5), theta (-1.171, 10)
-    # sum data: 791, theta off: 1082.8728756971127, sum model theta on: 1668.0413999999994
-    # difference: 291.8728756971127 (91.1531743939762 - 881.7814108999908) 
+    max_ag, max_t, max_d = size(data) # maximum age group, time, vaccine  
     ρ ~ filldist(Normal(-10, 0.5), max_ag)
     b ~ filldist(Normal(0, 0.5), max_t)
     θ ~ truncated(Normal(-1.171, 10), -Inf, 0)
@@ -132,20 +126,21 @@ end
 end
 
 function run_model(;progress=false, iter=5000, ag45=false) 
-    println("running model - ag45: $ag45")
-    #case_counts, pop_counts = get_data() #get_data()   
+    Random.seed!(1418)
+    println("running model - params: iter: $iter, ag45: $ag45")
     if ag45  
-        case_counts, pop_counts = get_consol_data()  #get_data()    
+        case_counts, pop_counts = get_consol_data()
     else 
         case_counts, pop_counts = get_data()
     end
     model_fun = model(case_counts, pop_counts);
-    sampler = NUTS(1000, 0.65) #  ϵ = 0.00625
+    sampler = NUTS(1000, 0.65)
     chain = sample(model_fun, sampler, iter; progress=progress)
     return chain, case_counts, pop_counts
 end
 
 function infer(modelresults) 
+    # describe(group(modelresults, :data)) .|> DataFrame
     _, pop_counts = get_data()    
     case_counts = Array{Union{Missing, Float64}}(undef, 8, 21, 2)
     prior_pred = predict(model(case_counts, pop_counts), modelresults)
@@ -164,8 +159,3 @@ function infer(modelresults)
 
     # DONT SEND SEYED THIS DATA -- THE MANUAL CALCULATION IS SLIGHTLY DIFFERENT (For Quantiles)
 end
-
-function process_infer(modelresults)
-    describe(group(modelresults, :data)) .|> DataFrame
-end
-
