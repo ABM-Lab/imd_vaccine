@@ -105,7 +105,13 @@ end
     max_ag, max_t, max_d = size(data) # maximum age group, time, vaccine  
     ρ ~ filldist(Normal(-10, 0.5), max_ag)
     b ~ filldist(Normal(0, 0.5), max_t)
-    θ ~ truncated(Normal(-1.171, 10), -Inf, 0)
+    σ ~ filldist(Truncated(Normal(0, 1), 0, Inf), max_t)
+    for i = 1:max_t
+        b[i] ~ Normal(0, σ[i]) # overwrite b prior distributions
+    end
+    θ₁ ~ truncated(Normal(-1.171, 10), -Inf, 0)
+    θ₂ ~ truncated(Normal(-1.171, 10), -Inf, 0)
+    θ = [θ₁, θ₂]
     for d = 1:max_d
         for t = 1:max_t
             for ag = 1:max_ag
@@ -114,7 +120,7 @@ end
                     data[ag, t, d] ~ Poisson(exp(λ)) 
                 else 
                     if K[ag, t, d] > 0 
-                        λ = log(K[ag, t, d]) + ρ[ag] + b[t] + θ
+                        λ = log(K[ag, t, d]) + ρ[ag] + b[t] + θ[d-1]
                         data[ag, t, d] ~ Poisson(exp(λ)) 
                     else 
                         data[ag, t, d] ~ Poisson(0) 
@@ -128,10 +134,10 @@ end
 function run_model(;progress=false, iter=5000, ag45=false) 
     Random.seed!(1418)
     println("running model - params: iter: $iter, ag45: $ag45")
-    if ag45  
+    if ag45  # we don't report this in the paper anymore so this branch is never run
         case_counts, pop_counts = get_consol_data()
     else 
-        case_counts, pop_counts = get_data()
+        case_counts, pop_counts = get_raw_data() #get_data()
     end
     model_fun = model(case_counts, pop_counts);
     sampler = NUTS(1000, 0.65)
