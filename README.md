@@ -1,2 +1,7 @@
-# imd_vaccine
-Impact of MenACWY Conjugate Vaccine on Reducing Invasive Meningococcal Disease
+## Impact of MenACWY Conjugate Vaccine on Reducing Invasive Meningococcal Disease
+
+We employed a Bayesian hierarchical Poisson regression model to investigate the potential trajectory of IMD among adolescents and young adults in the absence of vaccination, and estimate the number of IMD cases prevented from 2005 to 2021 as a direct effect of vaccination. The model was fitted to national incidence data for serogroups C, W, and Y from 2001 to 2021, with stratification of vaccination status for IMD cases. Using the parameterized model, we simulated a vaccination-free counterfactual scenario, while retaining the risk of disease for unvaccinated individuals estimated during model fitting. Comparing the counterfactual scenario with the best fit, we estimated the number of IMD cases and deaths averted by MenACWY vaccination.
+
+The model is implemented in `paper.jl` with further analysis + model run code in the notebook file `paper_model.ipynb`. The entire Julia code should be entirely reproducible, by instantiating the same environment using `Project.toml` and `Manifest.toml` files. The code is written in Julia Version 1.9.1 (2023-06-07).
+
+In a subfolder `vaccine_analysis_matlab`, there are some MATLAB codes that perform the analysis for vaccine uptake and national inference for case counts. The code is written in MATLAB R2022a. These are, ofcourse, separate from the Julia code.
